@@ -471,7 +471,7 @@ def main():
     print(f"\n🎯 GitHub发布建议:")
     print(f"- Tag: {version}")
     print(f"- Release Title: BBDownG {version}")
-    print(f"- 上传文件: {archive_name}")
+    print(f"- 上传文件: {os.path.basename(archive_path)}")
     print(f"- 发布说明: 使用 RELEASE_NOTES.md 内容")
     
     return True

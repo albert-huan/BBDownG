@@ -16,9 +16,25 @@ class WorkThread(QThread):
     def __init__(self, arg):
         super().__init__()
         self.arg = arg
+        self.qr_found = False
 
     def run(self):
-        for i in range(181):
+        # 先等待二维码生成
+        for i in range(10):  # 最多等待10秒
+            time.sleep(1)
+            if os.path.exists(os.path.join(os.getcwd(), 'qrcode.png')):
+                self.qr_found = True
+                self.s.emit('请扫描二维码')
+                break
+            else:
+                self.s.emit('获取二维码中...')
+        
+        if not self.qr_found:
+            self.s.emit('未获取到信息')
+            return
+            
+        # 等待登录完成
+        for i in range(171):  # 剩余171秒
             time.sleep(1)
             if ((self.arg == 'login') and (os.path.exists(os.path.join(workdir, 'BBDown.data')))) or (
                     (self.arg == "logintv") and (os.path.exists(os.path.join(workdir, "BBDownTV.data")))):
@@ -29,7 +45,8 @@ class WorkThread(QThread):
             elif os.path.exists(os.path.join(os.getcwd(), 'qrcode.png')):
                 self.s.emit('请扫描二维码')
             else:
-                self.s.emit('未获取到信息')
+                self.s.emit('二维码已失效')
+                break
 
 
 # 显示登录二维码窗口
@@ -66,11 +83,19 @@ class Login(QDialog, Ui_Dialog):
 
     # 显示图片和信息
     def display(self, s):
-        self.label_qr.setPixmap(QPixmap(os.path.join(os.getcwd(), 'qrcode.png')))
+        # 只有在二维码文件存在时才显示图片
+        qr_path = os.path.join(os.getcwd(), 'qrcode.png')
+        if os.path.exists(qr_path) and s in ['请扫描二维码', '登录成功']:
+            self.label_qr.setPixmap(QPixmap(qr_path))
+        
         self.label.setText(s)
+        
         if s == '关闭窗口':
-            if system == 'Linux':
-                subprocess.run(['kill', '-9', str(self.cmd.pid)])
-            else:
-                subprocess.run(['taskkill', '/F', '/T', '/PID', str(self.cmd.pid)], shell=True)
+            try:
+                if system == 'Linux':
+                    subprocess.run(['kill', '-9', str(self.cmd.pid)])
+                else:
+                    subprocess.run(['taskkill', '/F', '/T', '/PID', str(self.cmd.pid)], shell=True)
+            except:
+                pass  # 进程可能已经结束
             self.close()

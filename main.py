@@ -19,7 +19,7 @@ class MainWindow(Ui_MainWindow):
         super(MainWindow, self).__init__()
         self.parent = QMainWindow()
         self.setupUi(self.parent)
-        self.parent.setWindowTitle('BBDownG - 1.2 (Updated for BBDown Latest)')
+        self.parent.setWindowTitle('BBDownG - 1.2.0')
 
         flag = 0
         # 判断是否有配置文件
