@@ -9,6 +9,7 @@ from about import DialogAbout
 from output import DialogOutput
 from set_up import Window
 from login import Login
+from batch_download import BatchDownloadDialog
 from tools import workdir, save_config, load_config, read_config, config_path, system
 from UI import icon
 
@@ -39,6 +40,10 @@ class MainWindow(Ui_MainWindow):
         self.pushButton_download.clicked.connect(self.download)  # 开始下载
         self.pushButton_login.clicked.connect(lambda x: self.open_login('login'))
         self.pushButton_logintv.clicked.connect(lambda x: self.open_login('logintv'))
+        
+        # 添加批量下载按钮连接（如果存在的话）
+        if hasattr(self, 'pushButton_batch_download'):
+            self.pushButton_batch_download.clicked.connect(lambda: self.open_batch_download())
 
     # 设置下载保存路径
     def down_path(self):
@@ -76,24 +81,14 @@ class MainWindow(Ui_MainWindow):
 
         # 如果用户填写的下载地址是一个文本就根据文本内容下载
         if os.path.isfile(self.lineEdit_url.text()):
-            with open(self.lineEdit_url.text(), 'r') as f:
-                lines = f.readlines()
-            for line in lines:
-                if line.strip() == '':
-                    return
-                parts = args.split(' ')
-                parts[1] = f'"{line.strip()}"'
-                new_args = ' '.join(parts)
-
-                # 将参数传递到下载界面
-                output_window = DialogOutput(new_args, True)
-                output_window.exec()
-
+            # 使用批量下载功能
+            self.open_batch_download(self.lineEdit_url.text())
         else:
             # 将参数传递到下载界面
             output_window = DialogOutput(args)
             output_window.exec()
-        self.close_process(str(output_window.thread.p.pid))
+            if hasattr(output_window, 'thread') and hasattr(output_window.thread, 'p'):
+                self.close_process(str(output_window.thread.p.pid))
 
     # 下载参数
     def arg(self):
@@ -125,8 +120,9 @@ class MainWindow(Ui_MainWindow):
                 args += f' --dfn-priority "{dfn}"'
 
         # 下载源选择
-        choice = ['-tv', '', '-app', '-intl']
-        args += ' ' + choice[self.comboBox_source.currentIndex()] + ' '
+        choice = ['--use-tv-api', '', '--use-app-api', '--use-intl-api']
+        if choice[self.comboBox_source.currentIndex()]:
+            args += ' ' + choice[self.comboBox_source.currentIndex()] + ' '
 
         # 下载视频编码选择
         if self.comboBox_encoding.currentIndex() != 0:
@@ -152,6 +148,8 @@ class MainWindow(Ui_MainWindow):
             args += ' --sub-only '
         if config['checkBox_danmaku']:  # 下载弹幕
             args += ' --download-danmaku '
+        if config.get('checkBox_danmaku_only'):  # 仅下载弹幕
+            args += ' --danmaku-only '
         
         # 新增下载选项
         if config.get('checkBox_cover_only'):  # 仅下载封面
@@ -269,6 +267,193 @@ class MainWindow(Ui_MainWindow):
     def open_about(self):
         about_window = DialogAbout()
         about_window.exec()
+    
+    # 打开批量下载界面
+    def open_batch_download(self, file_path=None):
+        save_config(self)  # 保存配置
+        base_args = self.arg_for_batch()  # 获取批量下载参数
+        
+        batch_window = BatchDownloadDialog(base_args, self.lineEdit_dir.text())
+        
+        # 如果提供了文件路径，自动加载
+        if file_path:
+            batch_window.lineEdit_file_path.setText(file_path)
+            batch_window.load_urls_from_file(file_path)
+        
+        batch_window.exec()
+    
+    # 为批量下载生成参数（不包含具体URL）
+    def arg_for_batch(self):
+        args = ''
+
+        # 读取配置文件
+        config = read_config()
+
+        # BBDown路径
+        args += f'"{config["lineEdit_bbdown"]}"' if system == 'Windows' else f'{config["lineEdit_bbdown"]}'
+
+        # 视频下载地址占位符
+        args += ' "视频地址占位符" '
+
+        # 画质选择
+        if self.radioButton_dfn_priority.isChecked():
+            pass
+        elif self.radioButton_dfn_1080P.isChecked():
+            args += ' --dfn-priority "1080P 高清" '
+        elif self.radioButton_dfn_720P.isChecked():
+            args += ' --dfn-priority "720P 高清" '
+        elif self.radioButton_dfn_480P.isChecked():
+            args += ' --dfn-priority "480P 清晰" '
+        elif self.radioButton_dfn_360P.isChecked():
+            args += ' --dfn-priority "360P 流畅" '
+        elif self.radioButton_dfn_more.isChecked():  # 更多选项
+            if self.comboBox_dfn_more.currentIndex() != 0:
+                dfn = self.comboBox_dfn_more.itemText(self.comboBox_dfn_more.currentIndex())
+                args += f' --dfn-priority "{dfn}"'
+
+        # 下载源选择
+        choice = ['--use-tv-api', '', '--use-app-api', '--use-intl-api']
+        if choice[self.comboBox_source.currentIndex()]:
+            args += ' ' + choice[self.comboBox_source.currentIndex()] + ' '
+
+        # 下载视频编码选择
+        if self.comboBox_encoding.currentIndex() != 0:
+            choice = ['', 'avc', 'av1', 'hevc']
+            args += ' --encoding-priority ' + choice[self.comboBox_encoding.currentIndex()] + ' '
+
+        # 指定FFmpeg路径
+        if config['checkBox_ffmpeg']:
+            args += f' --ffmpeg-path "{config["lineEdit_ffmpeg"]}" '
+
+        # 下载分P选项
+        if self.radioButton_p_current.isChecked():
+            pass
+        elif self.radioButton_p_all.isChecked():
+            args += ' --select-page ALL '
+
+        # 下载选项
+        if config['checkBox_audio_only']:  # 仅下载音频
+            args += ' --audio-only '
+        if config['checkBox_video_only']:  # 仅下载视频
+            args += ' --video-only '
+        if config['checkBox_sub_only']:  # 仅下载字幕
+            args += ' --sub-only '
+        if config['checkBox_danmaku']:  # 下载弹幕
+            args += ' --download-danmaku '
+        if config.get('checkBox_danmaku_only'):  # 仅下载弹幕
+            args += ' --danmaku-only '
+        
+        # 新增下载选项
+        if config.get('checkBox_cover_only'):  # 仅下载封面
+            args += ' --cover-only '
+        if config.get('checkBox_danmaku_formats') and config.get('lineEdit_danmaku_formats'):  # 弹幕格式
+            args += f' --download-danmaku-formats "{config["lineEdit_danmaku_formats"]}" '
+
+        # 交互选项
+        if config['checkBox_ia']:  # 交互式选择清晰度
+            args += ' --interactive '
+        if config['checkBox_info']:  # 仅解析而不进行下载
+            args += ' --only-show-info '
+        if config['checkBox_hs']:  # 不显示所有音视频流
+            args += ' --hide-streams '
+        if config['checkBox_debug']:  # 输出调试日志
+            args += ' --debug '
+
+        # Cookies
+        if config['checkBox_token']:  # 单独设置access_token
+            args += f' --access-token "{config["lineEdit_token"]}" '
+        if config['checkBox_c']:  # 单独设置cookie
+            args += f' --cookie "{config["lineEdit_c"]}" '
+
+        # 跳过选项
+        if config['checkBox_skip_subtitle']:  # 跳过字幕下载
+            args += ' --skip-subtitle '
+        if config['checkBox_skip_cover']:  # 跳过封面下载
+            args += ' --skip-cover '
+        if config['checkBox_skip_mux']:  # 跳过混流步骤
+            args += ' --skip-mux '
+        if config['checkBox_skip_ai']:  # 跳过AI字幕下载
+            args += ' --skip-ai true '
+        else:
+            args += ' --skip-ai false '
+
+        # MP4box
+        if config['checkBox_mp4box']:  # 使用MP4Box来混流
+            args += ' --use-mp4box '
+        if config['checkBox_mp4box_path']:  # 设置MP4Box的路径
+            args += f' --mp4box-path "{config["lineEdit_mp4box_path"]}" '
+
+        # 其他
+        if config['checkBox_mt']:  # 使用多线程下载
+            args += ' --multi-thread '
+        if config['checkBox_force_http']:  # 使用HTTP替换HTTPS
+            args += ' --force-http '
+        if config['checkBox_language']:  # 设置混流的音频语言代码
+            args += f' --language {config["lineEdit_language"]} '
+        
+        # 新增其他选项
+        if config.get('checkBox_simply_mux'):  # 精简混流
+            args += ' --simply-mux '
+        if config.get('checkBox_video_ascending'):  # 视频升序
+            args += ' --video-ascending '
+        if config.get('checkBox_audio_ascending'):  # 音频升序
+            args += ' --audio-ascending '
+        if config.get('checkBox_force_replace_host'):  # 强制替换主机
+            args += ' --force-replace-host '
+        if config.get('checkBox_allow_pcdn'):  # 允许PCDN
+            args += ' --allow-pcdn '
+        if config.get('checkBox_show_all'):  # 显示所有分P
+            args += ' --show-all '
+
+        # 分P
+        if config['checkBox_p']:  # 指定分p范围
+            args += f' --select-page {config["lineEdit_p"]} '
+        if config['checkBox_p_delay']:  # 分p下载间隔
+            args += f' --delay-per-page {config["lineEdit_p_delay"]} '
+
+        # aria2c
+        if config['checkBox_use_aria2c']:  # 使用aria2c
+            args += ' --use-aria2c '
+            if config['checkBox_aria2c_path']:  # 文件路径
+                args += f' --aria2c-path "{config["lineEdit_aria2c_path"]}" '
+            if config['checkBox_aria2c_proxy']:  # 代理地址
+                args += f' --aria2c-proxy {config["lineEdit_aria2c_proxy"]} '
+            if config['checkBox_aria2c_args']:  # 附加参数
+                args += f' --aria2c-args "{config["lineEdit_aria2c_args"]}" '
+
+        # 文件名选项
+        if config['checkBox_F']:  # 单分P
+            args += f' --file-pattern "{config["lineEdit_F"]}" '
+        if config['checkBox_M']:  # 多分P
+            args += f' --multi-file-pattern "{config["lineEdit_M"]}" '
+
+        # 代理
+        if config['checkBox_enable_proxy']:  # 启用代理
+            if config['checkBox_host']:  # 代理地址
+                args += f' --host {config["lineEdit_host"]} '
+            if config['checkBox_ep_host']:  # 番剧代理
+                args += f' --ep-host {config["lineEdit_ep_host"]} '
+            if config['checkBox_area']:  # 地区指定
+                args += f' --area {config["lineEdit_area"]} '
+        
+        # 新增主机设置
+        if config.get('checkBox_upos_host') and config.get('lineEdit_upos_host'):  # UPOS主机
+            args += f' --upos-host {config["lineEdit_upos_host"]} '
+        if config.get('checkBox_tv_host') and config.get('lineEdit_tv_host'):  # TV主机
+            args += f' --tv-host {config["lineEdit_tv_host"]} '
+
+        # ua设置
+        if config['checkBox_ua']:
+            args += f' --user-agent "{config["lineEdit_ua"]}"'
+
+        # 是否记录已经下载视频，以便后续跳过
+        if config['checkBox_archives']:
+            args += f' --save-archives-to-file'
+
+        # 下载路径
+        args += f' --work-dir "{self.lineEdit_dir.text()}" ' if system == 'Windows' else f' --work-dir {self.lineEdit_dir.text()} '
+
+        return args
 
 
 # 启动主界面

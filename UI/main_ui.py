@@ -347,6 +347,16 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.pushButton_download)
 
+        self.pushButton_batch_download = QPushButton(self.centralwidget)
+        self.pushButton_batch_download.setObjectName(u"pushButton_batch_download")
+        sizePolicy4.setHeightForWidth(self.pushButton_batch_download.sizePolicy().hasHeightForWidth())
+        self.pushButton_batch_download.setSizePolicy(sizePolicy4)
+        self.pushButton_batch_download.setMinimumSize(QSize(0, 0))
+        self.pushButton_batch_download.setSizeIncrement(QSize(0, 10))
+        self.pushButton_batch_download.setFont(font)
+
+        self.horizontalLayout_7.addWidget(self.pushButton_batch_download)
+
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_7)
 
@@ -419,6 +429,7 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u89c6\u9891\u5730\u5740\uff1a", None))
         self.pushButton_text.setText(QCoreApplication.translate("MainWindow", u"\u6d4f\u89c8", None))
         self.pushButton_download.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d", None))
+        self.pushButton_batch_download.setText(QCoreApplication.translate("MainWindow", u"\u6279\u91cf\u4e0b\u8f7d", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u9009\u9879", None))
     # retranslateUi
 

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'setup_ui.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -24,9 +24,9 @@ class Ui_Dialog_SetUp(object):
     def setupUi(self, Dialog_SetUp):
         if not Dialog_SetUp.objectName():
             Dialog_SetUp.setObjectName(u"Dialog_SetUp")
-        Dialog_SetUp.resize(806, 528)
-        Dialog_SetUp.setMinimumSize(QSize(806, 528))
-        Dialog_SetUp.setMaximumSize(QSize(999, 999))
+        Dialog_SetUp.resize(900, 800)
+        Dialog_SetUp.setMinimumSize(QSize(900, 800))
+        Dialog_SetUp.setMaximumSize(QSize(1200, 1100))
         self.verticalLayout_12 = QVBoxLayout(Dialog_SetUp)
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
         self.horizontalLayout_3 = QHBoxLayout()
@@ -67,6 +67,30 @@ class Ui_Dialog_SetUp(object):
 
         self.verticalLayout.addWidget(self.checkBox_danmaku)
 
+        self.checkBox_danmaku_only = QCheckBox(self.groupBox)
+        self.checkBox_danmaku_only.setObjectName(u"checkBox_danmaku_only")
+        self.checkBox_danmaku_only.setFont(font)
+
+        self.verticalLayout.addWidget(self.checkBox_danmaku_only)
+
+        self.checkBox_cover_only = QCheckBox(self.groupBox)
+        self.checkBox_cover_only.setObjectName(u"checkBox_cover_only")
+        self.checkBox_cover_only.setFont(font)
+
+        self.verticalLayout.addWidget(self.checkBox_cover_only)
+
+        self.checkBox_danmaku_formats = QCheckBox(self.groupBox)
+        self.checkBox_danmaku_formats.setObjectName(u"checkBox_danmaku_formats")
+        self.checkBox_danmaku_formats.setFont(font)
+
+        self.verticalLayout.addWidget(self.checkBox_danmaku_formats)
+
+        self.lineEdit_danmaku_formats = QLineEdit(self.groupBox)
+        self.lineEdit_danmaku_formats.setObjectName(u"lineEdit_danmaku_formats")
+        self.lineEdit_danmaku_formats.setFont(font)
+
+        self.verticalLayout.addWidget(self.lineEdit_danmaku_formats)
+
 
         self.horizontalLayout.addWidget(self.groupBox)
 
@@ -98,6 +122,12 @@ class Ui_Dialog_SetUp(object):
         self.checkBox_debug.setFont(font)
 
         self.verticalLayout_5.addWidget(self.checkBox_debug)
+
+        self.checkBox_show_all = QCheckBox(self.groupBox_9)
+        self.checkBox_show_all.setObjectName(u"checkBox_show_all")
+        self.checkBox_show_all.setFont(font)
+
+        self.verticalLayout_5.addWidget(self.checkBox_show_all)
 
 
         self.horizontalLayout.addWidget(self.groupBox_9)
@@ -173,6 +203,12 @@ class Ui_Dialog_SetUp(object):
 
         self.verticalLayout_4.addWidget(self.checkBox_skip_ai)
 
+        self.checkBox_simply_mux = QCheckBox(self.groupBox_10)
+        self.checkBox_simply_mux.setObjectName(u"checkBox_simply_mux")
+        self.checkBox_simply_mux.setFont(font)
+
+        self.verticalLayout_4.addWidget(self.checkBox_simply_mux)
+
 
         self.horizontalLayout_2.addWidget(self.groupBox_10)
 
@@ -204,9 +240,10 @@ class Ui_Dialog_SetUp(object):
 
         self.horizontalLayout_2.addWidget(self.groupBox_4)
 
+        self.verticalLayout_14 = QVBoxLayout()
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.groupBox_11 = QGroupBox(Dialog_SetUp)
         self.groupBox_11.setObjectName(u"groupBox_11")
-        self.groupBox_11.setMinimumSize(QSize(0, 0))
         self.groupBox_11.setFont(font)
         self.verticalLayout_10 = QVBoxLayout(self.groupBox_11)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
@@ -226,34 +263,71 @@ class Ui_Dialog_SetUp(object):
 
         self.checkBox_archives = QCheckBox(self.groupBox_11)
         self.checkBox_archives.setObjectName(u"checkBox_archives")
+        self.checkBox_archives.setFont(font)
 
         self.verticalLayout_10.addWidget(self.checkBox_archives)
 
-        self.checkBox_ua = QCheckBox(self.groupBox_11)
+        self.checkBox_force_replace_host = QCheckBox(self.groupBox_11)
+        self.checkBox_force_replace_host.setObjectName(u"checkBox_force_replace_host")
+        self.checkBox_force_replace_host.setFont(font)
+
+        self.verticalLayout_10.addWidget(self.checkBox_force_replace_host)
+
+        self.checkBox_allow_pcdn = QCheckBox(self.groupBox_11)
+        self.checkBox_allow_pcdn.setObjectName(u"checkBox_allow_pcdn")
+        self.checkBox_allow_pcdn.setFont(font)
+
+        self.verticalLayout_10.addWidget(self.checkBox_allow_pcdn)
+
+
+        self.verticalLayout_14.addWidget(self.groupBox_11)
+
+        self.groupBox_15 = QGroupBox(Dialog_SetUp)
+        self.groupBox_15.setObjectName(u"groupBox_15")
+        self.groupBox_15.setFont(font)
+        self.verticalLayout_15 = QVBoxLayout(self.groupBox_15)
+        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
+        self.checkBox_video_ascending = QCheckBox(self.groupBox_15)
+        self.checkBox_video_ascending.setObjectName(u"checkBox_video_ascending")
+        self.checkBox_video_ascending.setFont(font)
+
+        self.verticalLayout_15.addWidget(self.checkBox_video_ascending)
+
+        self.checkBox_audio_ascending = QCheckBox(self.groupBox_15)
+        self.checkBox_audio_ascending.setObjectName(u"checkBox_audio_ascending")
+        self.checkBox_audio_ascending.setFont(font)
+
+        self.verticalLayout_15.addWidget(self.checkBox_audio_ascending)
+
+        self.checkBox_ua = QCheckBox(self.groupBox_15)
         self.checkBox_ua.setObjectName(u"checkBox_ua")
+        self.checkBox_ua.setFont(font)
 
-        self.verticalLayout_10.addWidget(self.checkBox_ua)
+        self.verticalLayout_15.addWidget(self.checkBox_ua)
 
-        self.lineEdit_ua = QLineEdit(self.groupBox_11)
+        self.lineEdit_ua = QLineEdit(self.groupBox_15)
         self.lineEdit_ua.setObjectName(u"lineEdit_ua")
-        self.lineEdit_ua.setMinimumSize(QSize(0, 0))
+        self.lineEdit_ua.setFont(font)
 
-        self.verticalLayout_10.addWidget(self.lineEdit_ua)
+        self.verticalLayout_15.addWidget(self.lineEdit_ua)
 
-        self.checkBox_language = QCheckBox(self.groupBox_11)
+        self.checkBox_language = QCheckBox(self.groupBox_15)
         self.checkBox_language.setObjectName(u"checkBox_language")
         self.checkBox_language.setFont(font)
 
-        self.verticalLayout_10.addWidget(self.checkBox_language)
+        self.verticalLayout_15.addWidget(self.checkBox_language)
 
-        self.lineEdit_language = QLineEdit(self.groupBox_11)
+        self.lineEdit_language = QLineEdit(self.groupBox_15)
         self.lineEdit_language.setObjectName(u"lineEdit_language")
         self.lineEdit_language.setFont(font)
 
-        self.verticalLayout_10.addWidget(self.lineEdit_language)
+        self.verticalLayout_15.addWidget(self.lineEdit_language)
 
 
-        self.horizontalLayout_2.addWidget(self.groupBox_11)
+        self.verticalLayout_14.addWidget(self.groupBox_15)
+
+
+        self.horizontalLayout_2.addLayout(self.verticalLayout_14)
 
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
@@ -448,6 +522,40 @@ class Ui_Dialog_SetUp(object):
 
         self.verticalLayout_9.addLayout(self.horizontalLayout_10)
 
+        self.horizontalLayout_15 = QHBoxLayout()
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+        self.checkBox_upos_host = QCheckBox(self.groupBox_13)
+        self.checkBox_upos_host.setObjectName(u"checkBox_upos_host")
+        self.checkBox_upos_host.setFont(font)
+
+        self.horizontalLayout_15.addWidget(self.checkBox_upos_host)
+
+        self.lineEdit_upos_host = QLineEdit(self.groupBox_13)
+        self.lineEdit_upos_host.setObjectName(u"lineEdit_upos_host")
+        self.lineEdit_upos_host.setFont(font)
+
+        self.horizontalLayout_15.addWidget(self.lineEdit_upos_host)
+
+
+        self.verticalLayout_9.addLayout(self.horizontalLayout_15)
+
+        self.horizontalLayout_16 = QHBoxLayout()
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.checkBox_tv_host = QCheckBox(self.groupBox_13)
+        self.checkBox_tv_host.setObjectName(u"checkBox_tv_host")
+        self.checkBox_tv_host.setFont(font)
+
+        self.horizontalLayout_16.addWidget(self.checkBox_tv_host)
+
+        self.lineEdit_tv_host = QLineEdit(self.groupBox_13)
+        self.lineEdit_tv_host.setObjectName(u"lineEdit_tv_host")
+        self.lineEdit_tv_host.setFont(font)
+
+        self.horizontalLayout_16.addWidget(self.lineEdit_tv_host)
+
+
+        self.verticalLayout_9.addLayout(self.horizontalLayout_16)
+
 
         self.verticalLayout_11.addLayout(self.verticalLayout_9)
 
@@ -546,11 +654,16 @@ class Ui_Dialog_SetUp(object):
         self.checkBox_video_only.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4ec5\u4e0b\u8f7d\u89c6\u9891", None))
         self.checkBox_sub_only.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4ec5\u4e0b\u8f7d\u5b57\u5e55", None))
         self.checkBox_danmaku.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4e0b\u8f7d\u5f39\u5e55", None))
+        self.checkBox_danmaku_only.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4ec5\u4e0b\u8f7d\u5f39\u5e55", None))
+        self.checkBox_cover_only.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4ec5\u4e0b\u8f7d\u5c01\u9762", None))
+        self.checkBox_danmaku_formats.setText(QCoreApplication.translate("Dialog_SetUp", u"\u5f39\u5e55\u683c\u5f0f\u9009\u62e9", None))
+        self.lineEdit_danmaku_formats.setPlaceholderText(QCoreApplication.translate("Dialog_SetUp", u"\u5982xml,ass", None))
         self.groupBox_9.setTitle(QCoreApplication.translate("Dialog_SetUp", u"\u4ea4\u4e92\u9009\u9879", None))
         self.checkBox_ia.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4ea4\u4e92\u5f0f\u9009\u62e9\u6e05\u6670\u5ea6", None))
         self.checkBox_info.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4ec5\u89e3\u6790\u800c\u4e0d\u8fdb\u884c\u4e0b\u8f7d", None))
         self.checkBox_hs.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4e0d\u663e\u793a\u6240\u6709\u97f3\u89c6\u9891\u6d41", None))
         self.checkBox_debug.setText(QCoreApplication.translate("Dialog_SetUp", u"\u8f93\u51fa\u8c03\u8bd5\u65e5\u5fd7", None))
+        self.checkBox_show_all.setText(QCoreApplication.translate("Dialog_SetUp", u"\u663e\u793a\u6240\u6709\u5206P", None))
         self.groupBox_5.setTitle(QCoreApplication.translate("Dialog_SetUp", u"cookies", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_token.setToolTip(QCoreApplication.translate("Dialog_SetUp", u"<html><head/><body><p>\u8bbe\u7f6eaccess_token\u7528\u4ee5\u4e0b\u8f7dTV/APP\u63a5\u53e3\u7684\u4f1a\u5458\u5185\u5bb9</p></body></html>", None))
@@ -567,6 +680,7 @@ class Ui_Dialog_SetUp(object):
         self.checkBox_skip_cover.setText(QCoreApplication.translate("Dialog_SetUp", u"\u8df3\u8fc7\u5c01\u9762\u4e0b\u8f7d", None))
         self.checkBox_skip_mux.setText(QCoreApplication.translate("Dialog_SetUp", u"\u8df3\u8fc7\u6df7\u6d41\u6b65\u9aa4", None))
         self.checkBox_skip_ai.setText(QCoreApplication.translate("Dialog_SetUp", u"\u8df3\u8fc7AI\u5b57\u5e55\u4e0b\u8f7d", None))
+        self.checkBox_simply_mux.setText(QCoreApplication.translate("Dialog_SetUp", u"\u7cbe\u7b80\u6df7\u6d41\u9009\u9879", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("Dialog_SetUp", u"MP4Box", None))
         self.checkBox_mp4box.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4f7f\u7528MP4Box\u6765\u6df7\u6d41", None))
         self.checkBox_mp4box_path.setText(QCoreApplication.translate("Dialog_SetUp", u"\u8bbe\u7f6eMP4Box\u7684\u8def\u5f84", None))
@@ -576,11 +690,17 @@ class Ui_Dialog_SetUp(object):
 #if QT_CONFIG(whatsthis)
         self.lineEdit_mp4box_path.setWhatsThis(QCoreApplication.translate("Dialog_SetUp", u"<html><head/><body><p>\u8def\u5f84\u4e0d\u8981\u5305\u542b\u7a7a\u683c</p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)
-        self.groupBox_11.setTitle(QCoreApplication.translate("Dialog_SetUp", u"\u5176\u4ed6", None))
+        self.groupBox_11.setTitle(QCoreApplication.translate("Dialog_SetUp", u"\u4e0b\u8f7d\u8bbe\u7f6e", None))
         self.checkBox_mt.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4f7f\u7528\u591a\u7ebf\u7a0b\u4e0b\u8f7d", None))
         self.checkBox_force_http.setText(QCoreApplication.translate("Dialog_SetUp", u"\u4f7f\u7528HTTP\u66ff\u6362HTTPS", None))
         self.checkBox_archives.setText(QCoreApplication.translate("Dialog_SetUp", u"\u8bb0\u5f55\u5df2\u4e0b\u8f7d\u89c6\u9891\uff0c\u540e\u7eed\u8df3\u8fc7", None))
+        self.checkBox_force_replace_host.setText(QCoreApplication.translate("Dialog_SetUp", u"\u5f3a\u5236\u66ff\u6362\u4e3b\u673a", None))
+        self.checkBox_allow_pcdn.setText(QCoreApplication.translate("Dialog_SetUp", u"\u5141\u8bb8PCDN", None))
+        self.groupBox_15.setTitle(QCoreApplication.translate("Dialog_SetUp", u"\u9ad8\u7ea7\u9009\u9879", None))
+        self.checkBox_video_ascending.setText(QCoreApplication.translate("Dialog_SetUp", u"\u89c6\u9891\u5347\u5e8f\u6392\u5217", None))
+        self.checkBox_audio_ascending.setText(QCoreApplication.translate("Dialog_SetUp", u"\u97f3\u9891\u5347\u5e8f\u6392\u5217", None))
         self.checkBox_ua.setText(QCoreApplication.translate("Dialog_SetUp", u"\u6307\u5b9auser-agent", None))
+        self.lineEdit_ua.setPlaceholderText(QCoreApplication.translate("Dialog_SetUp", u"\u7528\u6237\u4ee3\u7406\u5b57\u7b26\u4e32", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_language.setToolTip(QCoreApplication.translate("Dialog_SetUp", u"<html><head/><body><p>\u8bbe\u7f6e\u6df7\u6d41\u7684\u97f3\u9891\u8bed\u8a00(\u4ee3\u7801)\uff0c\u5982chi, jpn\u7b49</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -631,6 +751,10 @@ class Ui_Dialog_SetUp(object):
         self.checkBox_area.setText(QCoreApplication.translate("Dialog_SetUp", u"\u5730\u533a\u6307\u5b9a", None))
         self.lineEdit_area.setText("")
         self.lineEdit_area.setPlaceholderText(QCoreApplication.translate("Dialog_SetUp", u"\u5982hk", None))
+        self.checkBox_upos_host.setText(QCoreApplication.translate("Dialog_SetUp", u"UPOS\u4e3b\u673a", None))
+        self.lineEdit_upos_host.setPlaceholderText(QCoreApplication.translate("Dialog_SetUp", u"UPOS\u4e3b\u673a\u5730\u5740", None))
+        self.checkBox_tv_host.setText(QCoreApplication.translate("Dialog_SetUp", u"TV\u4e3b\u673a", None))
+        self.lineEdit_tv_host.setPlaceholderText(QCoreApplication.translate("Dialog_SetUp", u"TV\u4e3b\u673a\u5730\u5740", None))
         self.label_bbdown.setText(QCoreApplication.translate("Dialog_SetUp", u"BBDown\u4f4d\u7f6e", None))
 #if QT_CONFIG(tooltip)
         self.lineEdit_bbdown.setToolTip(QCoreApplication.translate("Dialog_SetUp", u"<html><head/><body><p>BBDown \u7a0b\u5e8f\u4f4d\u7f6e</p></body></html>", None))
