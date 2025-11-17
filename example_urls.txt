@@ -1,0 +1,27 @@
+# BBDownG 批量下载示例文件
+# 支持以下格式的视频地址：
+
+# 1. 完整的B站视频链接
+https://www.bilibili.com/video/BV1xx411c7mu
+https://www.bilibili.com/video/BV1GJ411x7h7
+
+# 2. 短链接
+https://b23.tv/BV1xx411c7mu
+
+# 3. 番剧链接
+https://www.bilibili.com/bangumi/play/ep123456
+https://www.bilibili.com/bangumi/play/ss12345
+
+# 4. 简化的BV号
+BV1xx411c7mu
+BV1GJ411x7h7
+
+# 5. 番剧EP号
+ep123456
+ss12345
+
+# 注意：
+# - 以 # 开头的行为注释，会被忽略
+# - 空行会被忽略
+# - 每行一个视频地址
+# - 程序会自动去重

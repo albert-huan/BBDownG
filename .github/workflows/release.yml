@@ -1,0 +1,265 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Download BBDown
+      run: |
+        Write-Host "Downloading latest BBDown..."
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/nilaoda/BBDown/releases/latest"
+        $asset = $response.assets | Where-Object { $_.name -like "*win-x64.zip" } | Select-Object -First 1
+        if ($asset) {
+          Write-Host "  Found: $($asset.name)"
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile BBDown.zip
+          Expand-Archive -Path BBDown.zip -DestinationPath BBDown-temp
+          Move-Item BBDown-temp/BBDown.exe . -Force
+          Remove-Item BBDown-temp -Recurse -Force
+          Remove-Item BBDown.zip
+          
+          # 验证 BBDown.exe 是否存在
+          if (Test-Path "BBDown.exe") {
+            Write-Host "✓ BBDown downloaded successfully"
+            Write-Host "  Location: BBDown.exe"
+          } else {
+            Write-Error "✗ BBDown.exe not found!"
+            exit 1
+          }
+        } else {
+          Write-Error "BBDown release not found"
+          exit 1
+        }
+      shell: pwsh
+    
+    - name: Download aria2
+      run: |
+        Write-Host "Downloading latest aria2..."
+        $aria2Url = "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip"
+        Invoke-WebRequest -Uri $aria2Url -OutFile aria2.zip
+        Expand-Archive -Path aria2.zip -DestinationPath .
+        $aria2Dir = Get-ChildItem -Directory -Filter "aria2-*" | Select-Object -First 1
+        Rename-Item $aria2Dir.FullName "aria2"
+        Remove-Item aria2.zip
+        
+        # 验证 aria2c.exe 是否存在
+        if (Test-Path "aria2\aria2c.exe") {
+          Write-Host "✓ aria2 downloaded successfully"
+          Write-Host "  Location: aria2\aria2c.exe"
+        } else {
+          Write-Error "✗ aria2c.exe not found!"
+          exit 1
+        }
+      shell: pwsh
+    
+    - name: Download ffmpeg
+      run: |
+        Write-Host "Downloading latest ffmpeg..."
+        $ffmpegUrl = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
+        Invoke-WebRequest -Uri $ffmpegUrl -OutFile ffmpeg.zip
+        Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg-temp
+        
+        # 查找 bin 目录
+        $binDir = Get-ChildItem -Path ffmpeg-temp -Recurse -Directory -Filter "bin" | Select-Object -First 1
+        
+        if ($binDir) {
+          # 如果找到 bin 目录，将其内容移动到 ffmpeg 目录
+          New-Item -ItemType Directory -Path "ffmpeg" -Force | Out-Null
+          Get-ChildItem -Path $binDir.FullName | Move-Item -Destination "ffmpeg" -Force
+          Write-Host "ffmpeg bin directory found and moved"
+        } else {
+          # 如果没有 bin 目录，直接重命名整个目录
+          $ffmpegDir = Get-ChildItem -Path ffmpeg-temp -Directory | Select-Object -First 1
+          if ($ffmpegDir) {
+            Rename-Item $ffmpegDir.FullName "ffmpeg"
+          }
+        }
+        
+        Remove-Item ffmpeg-temp -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item ffmpeg.zip
+        
+        # 验证 ffmpeg.exe 是否存在
+        if (Test-Path "ffmpeg\ffmpeg.exe") {
+          Write-Host "✓ ffmpeg downloaded successfully"
+          Write-Host "  Location: ffmpeg\ffmpeg.exe"
+        } else {
+          Write-Error "✗ ffmpeg.exe not found!"
+          exit 1
+        }
+      shell: pwsh
+        
+    - name: Verify downloaded files
+      run: |
+        Write-Host "`n=== Verifying downloaded files ===`n"
+        
+        Write-Host "BBDown.exe:"
+        if (Test-Path "BBDown.exe") {
+          $size = (Get-Item "BBDown.exe").Length / 1MB
+          Write-Host "  ✓ Found (${size:N2} MB)"
+        } else {
+          Write-Host "  ✗ Not found"
+        }
+        
+        Write-Host "`naria2 directory:"
+        if (Test-Path "aria2") {
+          Get-ChildItem "aria2" | ForEach-Object {
+            Write-Host "  - $($_.Name)"
+          }
+        } else {
+          Write-Host "  ✗ Not found"
+        }
+        
+        Write-Host "`nffmpeg directory:"
+        if (Test-Path "ffmpeg") {
+          Get-ChildItem "ffmpeg" | ForEach-Object {
+            Write-Host "  - $($_.Name)"
+          }
+        } else {
+          Write-Host "  ✗ Not found"
+        }
+        
+        Write-Host "`n=== End verification ===`n"
+      shell: pwsh
+        
+    - name: Build executable
+      run: python build_exe_minimal.py
+      
+    - name: Verify release package
+      run: |
+        Write-Host "`n=== Verifying BBDownG-Release package ===`n"
+        
+        if (Test-Path "BBDownG-Release") {
+          Get-ChildItem "BBDownG-Release" -Recurse | ForEach-Object {
+            if ($_.PSIsContainer) {
+              Write-Host "📁 $($_.FullName.Replace((Get-Location).Path + '\BBDownG-Release\', ''))"
+            } else {
+              $size = $_.Length / 1MB
+              Write-Host "📄 $($_.FullName.Replace((Get-Location).Path + '\BBDownG-Release\', '')) (${size:N2} MB)"
+            }
+          }
+        } else {
+          Write-Error "BBDownG-Release directory not found!"
+          exit 1
+        }
+        
+        Write-Host "`n=== End verification ===`n"
+      shell: pwsh
+    
+    - name: Create 7z archive
+      run: |
+        $version = "${{ github.ref_name }}"
+        if ([string]::IsNullOrEmpty($version)) {
+          $version = "dev"
+        }
+        $archiveName = "BBDownG-$version-Windows-x64.7z"
+        
+        Write-Host "Creating 7z archive: $archiveName"
+        
+        # 使用 7-Zip 创建压缩包（Windows runner 自带 7z）
+        7z a -t7z -mx=9 $archiveName ./BBDownG-Release/*
+        
+        if (Test-Path $archiveName) {
+          $size = (Get-Item $archiveName).Length / 1MB
+          Write-Host "✓ Archive created successfully (${size:N2} MB)"
+        } else {
+          Write-Error "Failed to create archive"
+          exit 1
+        }
+        
+        echo "ARCHIVE_NAME=$archiveName" >> $env:GITHUB_ENV
+      shell: pwsh
+      
+    - name: Create ZIP archive (备用)
+      run: |
+        $version = "${{ github.ref_name }}"
+        if ([string]::IsNullOrEmpty($version)) {
+          $version = "dev"
+        }
+        $zipName = "BBDownG-$version-Windows-x64.zip"
+        
+        Write-Host "Creating ZIP archive: $zipName"
+        
+        Compress-Archive -Path BBDownG-Release/* -DestinationPath $zipName
+        
+        if (Test-Path $zipName) {
+          $size = (Get-Item $zipName).Length / 1MB
+          Write-Host "✓ ZIP created successfully (${size:N2} MB)"
+        } else {
+          Write-Error "Failed to create ZIP"
+          exit 1
+        }
+        
+        echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+      shell: pwsh
+      
+    - name: Upload 7z artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: BBDownG-Windows-x64-7z
+        path: ${{ env.ARCHIVE_NAME }}
+        
+    - name: Upload ZIP artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: BBDownG-Windows-x64-zip
+        path: ${{ env.ZIP_NAME }}
+        
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ${{ env.ARCHIVE_NAME }}
+          ${{ env.ZIP_NAME }}
+        body: |
+          ## 📦 下载说明
+          
+          - **7z 压缩包**（推荐）：体积更小，需要 7-Zip 解压
+          - **ZIP 压缩包**：Windows 原生支持
+          
+          解压后运行 `BBDownG.exe` 即可使用。
+          
+          ## ✨ 主要功能
+          
+          - 🎨 现代化图形界面
+          - 🔐 扫码登录支持
+          - 📦 批量下载
+          - ⚙️ 完整功能支持
+          - 🚀 自动配置工具路径
+          - 💾 体积优化（约 50MB）
+          
+          ## 📝 更新内容
+          
+          详见 [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+          
+          ## 🔗 相关链接
+          
+          - 项目主页: https://github.com/${{ github.repository }}
+          - 问题反馈: https://github.com/${{ github.repository }}/issues
+          - BBDown: https://github.com/nilaoda/BBDown
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        token: ${{ secrets.GITHUB_TOKEN }}
